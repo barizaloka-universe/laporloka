@@ -28,10 +28,7 @@ class Laporan extends Model
         'judul_laporan',
         'deskripsi',
         'lokasi_detail',
-        'desa',
-        'kecamatan',
-        'kabupaten',
-        'provinsi',
+        'desa_id',
         'status',
         'prioritas',
         'catatan_admin',
@@ -49,12 +46,12 @@ class Laporan extends Model
     ];
 
     /**
-     * Atribut default.
+     * Relasi ke model Desa.
      *
-     * @var array
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    protected $attributes = [
-        'status' => 'terkirim',
-        'prioritas' => 'sedang',
-    ];
+    public function desa()
+    {
+        return $this->belongsTo(Desa::class, 'desa_id', 'kode_desa');
+    }
 }
