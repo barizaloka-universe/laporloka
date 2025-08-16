@@ -1,43 +1,37 @@
 <?php
 
 use App\Models\Laporan;
-
+use App\Models\Desa; // Impor model Desa
 use Illuminate\Support\Facades\Request;
-
 use Illuminate\Support\Facades\Session;
-
 use Illuminate\Support\Str;
-
 use Livewire\Attributes\Rule;
-
 use Livewire\Volt\Component;
 
-new class extends Component {
+new class extends Component
+{
     #[Rule('required|string|max:255')]
     public string $judul_laporan = '';
 
     #[Rule('required|string')]
     public string $deskripsi = '';
 
-    #[Rule('nullable|string|max:255')]
-    public string $desa = '';
-
-    #[Rule('nullable|string|max:255')]
-    public string $kecamatan = '';
-
-    #[Rule('nullable|string|max:255')]
-    public string $kabupaten = '';
-
-    #[Rule('nullable|string|max:255')]
-    public string $provinsi = '';
+    // Mengubah properti menjadi desa_id agar sesuai dengan kolom di database
+    #[Rule('required|string|max:255')]
+    public string $desa_id = '';
 
     #[Rule('required|string|max:255')]
     public string $lokasi_detail = '';
 
+    // Properti untuk menyimpan daftar desa
+    public $desas = [];
 
     public function mount()
     {
         $this->laporans = Laporan::latest()->take(5)->get();
+
+        // Mengambil semua data dari model Desa
+        $this->desas = Desa::all();
     }
 
     public function simpanLaporan()
@@ -47,27 +41,19 @@ new class extends Component {
         $laporan = new Laporan();
 
         $laporan->judul_laporan = $validated['judul_laporan'];
-
         $laporan->deskripsi = $validated['deskripsi'];
-
-        $laporan->desa = $validated['desa'];
-
-        $laporan->kecamatan = $validated['kecamatan'];
-
-        $laporan->kabupaten = $validated['kabupaten'];
-
-        $laporan->provinsi = $validated['provinsi'];
-
+        
+        // Menggunakan desa_id, bukan desa
+        $laporan->desa_id = $validated['desa_id'];
+        
         $laporan->lokasi_detail = $validated['lokasi_detail'];
 
         $laporan->save();
 
         // Reset field
-
-        $this->reset(['judul_laporan', 'deskripsi', 'desa', 'kecamatan', 'kabupaten', 'provinsi', 'lokasi_detail']);
+        $this->reset(['judul_laporan', 'deskripsi', 'desa_id', 'lokasi_detail']);
 
         // Refresh data
-
         $this->mount();
 
         Session::flash('message', 'Laporan Anda berhasil dikirim!');
@@ -80,7 +66,6 @@ new class extends Component {
         ];
     }
 }; ?>
-
 
 <form wire:submit="simpanLaporan" class="space-y-6">
     @csrf
@@ -109,6 +94,24 @@ new class extends Component {
             class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
             required></textarea>
         @error('deskripsi')
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+        @enderror
+    </div>
+
+    <!-- Dropdown Desa -->
+    <div>
+        <label for="desa_id" class="block text-sm font-medium text-gray-700 mb-2">
+            Pilih Desa
+        </label>
+        <select id="desa_id" name="desa_id" wire:model="desa_id"
+            class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            required>
+            <option value="">-- Pilih Desa --</option>
+            @foreach($desas as $desa)
+                <option value="{{ $desa->kode_desa }}">{{ $desa->nama_desa }}</option>
+            @endforeach
+        </select>
+        @error('desa_id')
             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
         @enderror
     </div>
