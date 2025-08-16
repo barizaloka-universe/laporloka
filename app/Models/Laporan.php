@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Enums\LaporanStatus;
 use App\Enums\LaporanPrioritas;
+use App\Models\Desa;
 
 class Laporan extends Model
 {

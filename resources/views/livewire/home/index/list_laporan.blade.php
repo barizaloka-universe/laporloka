@@ -4,20 +4,38 @@ use Livewire\Volt\Component;
 use App\Enums\LaporanStatus;
 use App\Enums\LaporanPrioritas;
 use Illuminate\Support\Str;
+use App\Models\Laporan;
+use App\Models\Desa;
 
 new class extends Component {
     public $laporans;
+    public $desas;
+    public $selectedDesa = null;
 
-    public function mount($laporans)
+    public function mount()
     {
-        $this->laporans = $laporans;
+        // Ambil semua data desa dari model Desa
+        $this->desas = Desa::all();
+        // Awalnya, tampilkan koleksi laporan kosong
+        $this->laporans = collect(); 
+    }
+
+    public function updatedSelectedDesa($value)
+    {
+        // Jika desa dipilih, ambil laporannya berdasarkan desa_id
+        if ($value) {
+            $this->laporans = Laporan::where('desa_id', $value)->get();
+        } else {
+            // Jika tidak ada desa yang dipilih, kosongkan laporan
+            $this->laporans = collect();
+        }
     }
 
     public function getStatusLabel($status)
     {
         return match ($status) {
             LaporanStatus::Terkirim => 'Terkirim',
-            LaporanStatus::Diterima => 'Diterima',
+            LaporanStatus::Duplikat => 'Duplikat',
             LaporanStatus::Diproses => 'Diproses',
             LaporanStatus::Selesai => 'Selesai',
             LaporanStatus::Ditolak => 'Ditolak',
@@ -27,11 +45,11 @@ new class extends Component {
 
     public function getStatusClasses($status)
     {
-        $baseClasses = 'px-2.5 py-1 rounded-full text-xs font-medium'; // Mengubah py-1 menjadi py-1.5 agar lebih berisi
+        $baseClasses = 'px-2.5 py-1 rounded-full text-xs font-medium';
 
         $statusClasses = match ($status) {
             LaporanStatus::Terkirim => 'bg-gray-100 text-gray-700 ring-1 ring-inset ring-gray-200',
-            LaporanStatus::Diterima => 'bg-blue-100 text-blue-700 ring-1 ring-inset ring-blue-200',
+            LaporanStatus::Duplikat => 'bg-blue-100 text-blue-700 ring-1 ring-inset ring-blue-200',
             LaporanStatus::Diproses => 'bg-yellow-100 text-yellow-700 ring-1 ring-inset ring-yellow-200',
             LaporanStatus::Selesai => 'bg-green-100 text-green-700 ring-1 ring-inset ring-green-200',
             LaporanStatus::Ditolak => 'bg-red-100 text-red-700 ring-1 ring-inset ring-red-200',
@@ -41,7 +59,6 @@ new class extends Component {
         return $baseClasses . ' ' . $statusClasses;
     }
     
-    // Metode untuk prioritas
     public function getPrioritasLabel($prioritas)
     {
         return match ($prioritas) {
@@ -68,6 +85,20 @@ new class extends Component {
 }; ?>
 
 <div class="space-y-6 lg:space-y-8">
+
+    {{-- Dropdown untuk Memilih Desa --}}
+    <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+        <label for="desa-select" class="block text-sm font-medium text-gray-700 mb-2">Pilih Desa untuk melihat laporan</label>
+        <select id="desa-select"
+            wire:model="selectedDesa"
+            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+            <option value="">-- Pilih Desa --</option>
+            @foreach ($desas as $desa)
+                <option value="{{ $desa->id }}">{{ $desa->nama_desa }}</option>
+            @endforeach
+        </select>
+    </div>
+
     @if ($laporans->isEmpty())
         <div class="bg-white rounded-xl shadow-md p-8 text-center border border-gray-200">
             <div class="text-gray-400 mb-4">
@@ -76,7 +107,13 @@ new class extends Component {
                 </svg>
             </div>
             <h3 class="text-gray-500 text-xl font-semibold">Belum Ada Laporan</h3>
-            <p class="text-gray-400 text-sm mt-2">Laporan yang Anda kirimkan akan muncul di sini.</p>
+            <p class="text-gray-400 text-sm mt-2">
+                @if ($selectedDesa)
+                    Belum ada laporan yang dikirim untuk desa ini.
+                @else
+                    Silakan pilih desa untuk menampilkan laporan.
+                @endif
+            </p>
         </div>
     @else
         @foreach ($laporans as $laporan)
@@ -93,7 +130,7 @@ new class extends Component {
                             <span class="{{ $this->getStatusClasses($laporan->status) }}">
                                 {{ $this->getStatusLabel($laporan->status) }}
                             </span>
-                             {{-- Prioritas Badge --}}
+                            {{-- Prioritas Badge --}}
                             @if ($laporan->prioritas)
                                 <span class="{{ $this->getPrioritasClasses($laporan->prioritas) }}">
                                     Prioritas: {{ $this->getPrioritasLabel($laporan->prioritas) }}

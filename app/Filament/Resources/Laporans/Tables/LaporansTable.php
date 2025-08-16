@@ -20,6 +20,13 @@ class LaporansTable
                 TextColumn::make('judul_laporan')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('deskripsi')
+                    ->searchable()
+                    ->limit(50),
+                TextColumn::make('desa.nama_desa')
+                    ->label('Desa')
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('status'),
                 TextColumn::make('prioritas'),
                 // TextColumn::make('status')

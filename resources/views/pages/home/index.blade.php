@@ -10,7 +10,7 @@
 
         <div class="mt-12 max-w-2xl mx-auto">
             <h3 class="text-xl font-bold text-gray-800 mb-4">Laporan Terbaru</h3>
-            @livewire('home/index/list_laporan', ['laporans' => $laporans])
+            @livewire('home/index/list_laporan')
         </div>
     </main>
 </x-layouts.home>
