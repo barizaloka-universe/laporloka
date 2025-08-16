@@ -5,7 +5,7 @@ namespace App\Enums;
 enum LaporanStatus: string
 {
     case Terkirim = 'terkirim';
-    case Diterima = 'diterima';
+    case Duplikat = 'duplikat';
     case Diproses = 'diproses';
     case Selesai = 'selesai';
     case Ditolak = 'ditolak';
