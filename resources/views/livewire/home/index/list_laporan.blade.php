@@ -6,6 +6,7 @@ use App\Enums\LaporanPrioritas;
 use Illuminate\Support\Str;
 use App\Models\Laporan;
 use App\Models\Desa;
+use Livewire\Attributes\On; 
 
 new class extends Component {
     public $laporans;
@@ -18,17 +19,30 @@ new class extends Component {
         $this->desas = Desa::all();
         // Awalnya, tampilkan koleksi laporan kosong
         $this->laporans = collect(); 
+
+        // Livewire v3: Jalankan JavaScript saat komponen dimuat
+        // Memuat nilai dari cache browser (localStorage)
+        $this->js(<<<JS
+            const cachedDesa = localStorage.getItem('selectedDesa');
+            if (cachedDesa) {
+                // Set properti Livewire dengan nilai dari cache
+                \$wire.set('selectedDesa', cachedDesa);
+            }
+        JS);
     }
 
     public function updatedSelectedDesa($value)
     {
-        // Jika desa dipilih, ambil laporannya berdasarkan desa_id
+        // Simpan nilai desa yang dipilih ke cache browser (localStorage)
+        // Ini akan dieksekusi setiap kali nilai selectedDesa berubah
         if ($value && $value !== '') {
+            $this->js("localStorage.setItem('selectedDesa', '{$value}');");
             $this->laporans = Laporan::where('desa_id', $value)
                 ->orderBy('created_at', 'desc')
                 ->get();
         } else {
-            // Jika tidak ada desa yang dipilih, kosongkan laporan
+            // Jika tidak ada desa yang dipilih, hapus dari cache
+            $this->js("localStorage.removeItem('selectedDesa');");
             $this->laporans = collect();
         }
     }
