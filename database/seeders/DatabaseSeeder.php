@@ -6,6 +6,10 @@ use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Laporan;
+use Database\Seeders\ProvinsiSeeder;
+use Database\Seeders\KabupatenSeeder;
+use Database\Seeders\KecamatanSeeder;
+use Database\Seeders\DesaSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,6 +20,15 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
         Laporan::factory(50)->create();
+
+        $this->call([
+            ProvinsiSeeder::class,
+            KabupatenSeeder::class,
+            KecamatanSeeder::class,
+            DesaSeeder::class,
+            // Add other seeders here if needed
+            // Example: OtherSeeder::class,
+        ]);
 
         // User::factory()->create([
         //     'name' => 'Test User',
