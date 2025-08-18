@@ -21,69 +21,40 @@ class LaporansTable
     {
         return $table
             ->columns([
-                TextColumn::make('judul_laporan')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('deskripsi')
-                    ->searchable()
-                    ->limit(50),
-                TextColumn::make('desa.nama_desa')
-                    ->label('Desa')
-                    ->searchable()
-                    ->sortable(),
+                TextColumn::make('judul_laporan')->searchable()->sortable(),
+                TextColumn::make('deskripsi')->searchable()->limit(50)->sortable(),
+                TextColumn::make('desa.nama_desa')->label('Desa')->searchable()->sortable(),
                 TextColumn::make('status'),
                 TextColumn::make('prioritas'),
-                // TextColumn::make('status')
-                //     ->badge()
-                //     ->color(fn (string $state): string => match ($state) {
-                //         'terkirim' => 'gray',
-                //         'diterima' => 'info',
-                //         'diproses' => 'warning',
-                //         'selesai' => 'success',
-                //         'ditolak' => 'danger',
-                //         'butuh_info_tambahan' => 'warning',
-                //     })
-                //     ->sortable(),
-                // TextColumn::make('prioritas')
-                //     ->badge()
-                //     ->color(fn (string $state): string => match ($state) {
-                //         'rendah' => 'gray',
-                //         'sedang' => 'info',
-                //         'tinggi' => 'warning',
-                //         'darurat' => 'danger',
-                //     })
-                //     ->sortable(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('deleted_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('created_at')->dateTime()->sortable(),
+                TextColumn::make('updated_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('deleted_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 TrashedFilter::make(),
-                 SelectFilter::make('desa_id')
-                    ->label('Filter berdasarkan Desa')
-                    ->relationship('desa', 'nama_desa')
-                    ->searchable()
-                    ->preload(),
+                SelectFilter::make('desa_id')->label('Filter berdasarkan Desa')->relationship('desa', 'nama_desa')->searchable()->preload(),
+                // berdasarkan status
+                SelectFilter::make('status')
+                    ->options([
+                        'terkirim' => 'Terkirim',
+                        'diterima' => 'Diterima',
+                        'diproses' => 'Diproses',
+                        'selesai' => 'Selesai',
+                        'ditolak' => 'Ditolak',
+                        'butuh_info_tambahan' => 'Butuh Info Tambahan',
+                    ])
+                    ->searchable(),
+                // berdasarkan prioritas
+                SelectFilter::make('prioritas')
+                    ->options([
+                        'rendah' => 'Rendah',
+                        'sedang' => 'Sedang',
+                        'tinggi' => 'Tinggi',
+                        'darurat' => 'Darurat',
+                    ])
+                    ->searchable(),
             ])
-            ->recordActions([
-                EditAction::make(),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                    ForceDeleteBulkAction::make(),
-                    RestoreBulkAction::make(),
-                ]),
-            ]);
+            ->recordActions([EditAction::make()])
+            ->toolbarActions([BulkActionGroup::make([DeleteBulkAction::make(), ForceDeleteBulkAction::make(), RestoreBulkAction::make()])]);
     }
 }
-
