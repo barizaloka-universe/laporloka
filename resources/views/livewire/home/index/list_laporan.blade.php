@@ -6,45 +6,78 @@ use App\Enums\LaporanPrioritas;
 use Illuminate\Support\Str;
 use App\Models\Laporan;
 use App\Models\Desa;
-use Livewire\Attributes\On; 
+use Livewire\Attributes\On;
 
 new class extends Component {
     public $laporans;
     public $desas;
     public $selectedDesa = '';
+    public $selectedStatus = '';
+    public $selectedPrioritas = '';
 
     public function mount()
     {
-        // Ambil semua data desa dari model Desa
         $this->desas = Desa::all();
-        // Awalnya, tampilkan koleksi laporan kosong
-        $this->laporans = collect(); 
+        $this->laporans = collect();
 
-        // Livewire v3: Jalankan JavaScript saat komponen dimuat
-        // Memuat nilai dari cache browser (localStorage)
-        $this->js(<<<JS
-            const cachedDesa = localStorage.getItem('selectedDesa');
-            if (cachedDesa) {
-                // Set properti Livewire dengan nilai dari cache
-                \$wire.set('selectedDesa', cachedDesa);
-            }
-        JS);
+        $this->js(
+            <<<JS
+                const cachedDesa = localStorage.getItem('selectedDesa');
+                const cachedStatus = localStorage.getItem('selectedStatus');
+                const cachedPrioritas = localStorage.getItem('selectedPrioritas');
+
+                if (cachedDesa) \$wire.set('selectedDesa', cachedDesa);
+                if (cachedStatus) \$wire.set('selectedStatus', cachedStatus);
+                if (cachedPrioritas) \$wire.set('selectedPrioritas', cachedPrioritas);
+            JS
+            ,
+        );
     }
 
     public function updatedSelectedDesa($value)
     {
-        // Simpan nilai desa yang dipilih ke cache browser (localStorage)
-        // Ini akan dieksekusi setiap kali nilai selectedDesa berubah
+        $this->cacheFilter('selectedDesa', $value);
+        $this->loadLaporans();
+    }
+
+    public function updatedSelectedStatus($value)
+    {
+        $this->cacheFilter('selectedStatus', $value);
+        $this->loadLaporans();
+    }
+
+    public function updatedSelectedPrioritas($value)
+    {
+        $this->cacheFilter('selectedPrioritas', $value);
+        $this->loadLaporans();
+    }
+
+    private function cacheFilter($key, $value)
+    {
         if ($value && $value !== '') {
-            $this->js("localStorage.setItem('selectedDesa', '{$value}');");
-            $this->laporans = Laporan::where('desa_id', $value)
-                ->orderBy('created_at', 'desc')
-                ->get();
+            $this->js("localStorage.setItem('{$key}', '{$value}');");
         } else {
-            // Jika tidak ada desa yang dipilih, hapus dari cache
-            $this->js("localStorage.removeItem('selectedDesa');");
-            $this->laporans = collect();
+            $this->js("localStorage.removeItem('{$key}');");
         }
+    }
+
+    private function loadLaporans()
+    {
+        $query = Laporan::query();
+
+        if ($this->selectedDesa) {
+            $query->where('desa_id', $this->selectedDesa);
+        }
+
+        if ($this->selectedStatus) {
+            $query->where('status', $this->selectedStatus);
+        }
+
+        if ($this->selectedPrioritas) {
+            $query->where('prioritas', $this->selectedPrioritas);
+        }
+
+        $this->laporans = $query->orderBy('created_at', 'desc')->get();
     }
 
     public function getStatusLabel($status)
@@ -74,7 +107,7 @@ new class extends Component {
 
         return $baseClasses . ' ' . $statusClasses;
     }
-    
+
     public function getPrioritasLabel($prioritas)
     {
         return match ($prioritas) {
@@ -89,7 +122,7 @@ new class extends Component {
     public function getPrioritasClasses($prioritas)
     {
         $baseClasses = 'px-2.5 py-1 rounded-full text-xs font-medium';
-        
+
         $prioritasClasses = match ($prioritas) {
             LaporanPrioritas::Rendah => 'bg-green-100 text-green-700',
             LaporanPrioritas::Sedang => 'bg-yellow-100 text-yellow-700',
@@ -102,13 +135,14 @@ new class extends Component {
     }
 }; ?>
 
+
 <div class="space-y-6 lg:space-y-8">
 
     {{-- Dropdown untuk Memilih Desa --}}
     <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
-        <label for="desa-select" class="block text-sm font-medium text-gray-700 mb-2">Pilih Desa untuk melihat laporan</label>
-        <select id="desa-select"
-            wire:model.live="selectedDesa"
+        <label for="desa-select" class="block text-sm font-medium text-gray-700 mb-2">Pilih Desa untuk melihat
+            laporan</label>
+        <select id="desa-select" wire:model.live="selectedDesa"
             class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
             <option value="">-- Pilih Desa --</option>
             @foreach ($desas as $desa)
@@ -118,21 +152,52 @@ new class extends Component {
     </div>
 
     {{-- Loading State --}}
-    <div wire:loading wire:target="selectedDesa" class="bg-white rounded-xl shadow-md p-8 text-center border border-gray-200">
+    <div wire:loading wire:target="selectedDesa"
+        class="bg-white rounded-xl shadow-md p-8 text-center border border-gray-200">
         <div class="text-gray-400 mb-4">
             <svg class="animate-spin mx-auto h-8 w-8" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                </circle>
+                <path class="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                </path>
             </svg>
         </div>
         <p class="text-gray-500">Memuat laporan...</p>
     </div>
 
+    {{-- Filter Tambahan --}}
+    <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200 space-y-4">
+        <div>
+            <label for="status-select" class="block text-sm font-medium text-gray-700 mb-2">Filter Status</label>
+            <select id="status-select" wire:model.live="selectedStatus"
+                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 sm:text-sm rounded-md">
+                <option value="">-- Semua Status --</option>
+                @foreach (App\Enums\LaporanStatus::cases() as $status)
+                    <option value="{{ $status->value }}">{{ $this->getStatusLabel($status) }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div>
+            <label for="prioritas-select" class="block text-sm font-medium text-gray-700 mb-2">Filter Prioritas</label>
+            <select id="prioritas-select" wire:model.live="selectedPrioritas"
+                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 sm:text-sm rounded-md">
+                <option value="">-- Semua Prioritas --</option>
+                @foreach (App\Enums\LaporanPrioritas::cases() as $prioritas)
+                    <option value="{{ $prioritas->value }}">{{ $this->getPrioritasLabel($prioritas) }}</option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+
     @if ($laporans->isEmpty() && !$selectedDesa)
         <div class="bg-white rounded-xl shadow-md p-8 text-center border border-gray-200">
             <div class="text-gray-400 mb-4">
-                <svg class="mx-auto h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M17.25 12V4.5m1.5 0H21m-2.25 18H15M4.5 9.75v10.5m0-10.5a1.5 1.5 0 01-1.5-1.5V6a2.25 2.25 0 012.25-2.25h1.372c.516 0 .966.351 1.107.855l.208.73a1.5 1.5 0 001.442 1.08h3.525a1.5 1.5 0 001.442-1.08l.208-.73c.141-.504.591-.855 1.107-.855h1.372A2.25 2.25 0 0121 6v6.75m-18 0v2.25A2.25 2.25 0 005.25 15h13.5a2.25 2.25 0 002.25-2.25V12M15 18a3 3 0 11-6 0 3 3 0 016 0z" />
+                <svg class="mx-auto h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                    stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M17.25 12V4.5m1.5 0H21m-2.25 18H15M4.5 9.75v10.5m0-10.5a1.5 1.5 0 01-1.5-1.5V6a2.25 2.25 0 012.25-2.25h1.372c.516 0 .966.351 1.107.855l.208.73a1.5 1.5 0 001.442 1.08h3.525a1.5 1.5 0 001.442-1.08l.208-.73c.141-.504.591-.855 1.107-.855h1.372A2.25 2.25 0 0121 6v6.75m-18 0v2.25A2.25 2.25 0 005.25 15h13.5a2.25 2.25 0 002.25-2.25V12M15 18a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
             </div>
             <h3 class="text-gray-500 text-xl font-semibold">Pilih Desa</h3>
@@ -143,8 +208,10 @@ new class extends Component {
     @elseif ($laporans->isEmpty() && $selectedDesa)
         <div class="bg-white rounded-xl shadow-md p-8 text-center border border-gray-200">
             <div class="text-gray-400 mb-4">
-                <svg class="mx-auto h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M17.25 12V4.5m1.5 0H21m-2.25 18H15M4.5 9.75v10.5m0-10.5a1.5 1.5 0 01-1.5-1.5V6a2.25 2.25 0 012.25-2.25h1.372c.516 0 .966.351 1.107.855l.208.73a1.5 1.5 0 001.442 1.08h3.525a1.5 1.5 0 001.442-1.08l.208-.73c.141-.504.591-.855 1.107-.855h1.372A2.25 2.25 0 0121 6v6.75m-18 0v2.25A2.25 2.25 0 005.25 15h13.5a2.25 2.25 0 002.25-2.25V12M15 18a3 3 0 11-6 0 3 3 0 016 0z" />
+                <svg class="mx-auto h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                    stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M17.25 12V4.5m1.5 0H21m-2.25 18H15M4.5 9.75v10.5m0-10.5a1.5 1.5 0 01-1.5-1.5V6a2.25 2.25 0 012.25-2.25h1.372c.516 0 .966.351 1.107.855l.208.73a1.5 1.5 0 001.442 1.08h3.525a1.5 1.5 0 001.442-1.08l.208-.73c.141-.504.591-.855 1.107-.855h1.372A2.25 2.25 0 0121 6v6.75m-18 0v2.25A2.25 2.25 0 005.25 15h13.5a2.25 2.25 0 002.25-2.25V12M15 18a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
             </div>
             <h3 class="text-gray-500 text-xl font-semibold">Belum Ada Laporan</h3>
@@ -155,7 +222,8 @@ new class extends Component {
     @else
         <div wire:loading.remove wire:target="selectedDesa">
             @foreach ($laporans as $laporan)
-                <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden border border-gray-200">
+                <div
+                    class="bg-white rounded-xl my-2 shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden border border-gray-200">
                     {{-- Header --}}
                     <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
                         <div class="flex items-center justify-between">
@@ -175,7 +243,8 @@ new class extends Component {
                                     </span>
                                 @endif
                             </div>
-                            <span class="text-xs text-gray-500 shrink-0" title="{{ $laporan->created_at->format('d M Y, H:i') }}">
+                            <span class="text-xs text-gray-500 shrink-0"
+                                title="{{ $laporan->created_at->format('d M Y, H:i') }}">
                                 {{ $laporan->created_at->diffForHumans() }}
                             </span>
                         </div>
@@ -195,15 +264,17 @@ new class extends Component {
                                 <div x-data="{ open: false }" class="mb-4 text-gray-700 text-sm">
                                     <p x-show="!open" class="mb-2">
                                         {{ Str::limit($laporan->deskripsi, 150) }}
-                                        @if(strlen($laporan->deskripsi) > 150)
-                                            <button @click="open = true" class="text-blue-600 hover:underline focus:outline-none ml-1">
+                                        @if (strlen($laporan->deskripsi) > 150)
+                                            <button @click="open = true"
+                                                class="text-blue-600 hover:underline focus:outline-none ml-1">
                                                 Selengkapnya
                                             </button>
                                         @endif
                                     </p>
                                     <div x-show="open" class="mb-2">
                                         <p class="whitespace-pre-line">{{ $laporan->deskripsi }}</p>
-                                        <button @click="open = false" class="text-blue-600 hover:underline focus:outline-none mt-1">
+                                        <button @click="open = false"
+                                            class="text-blue-600 hover:underline focus:outline-none mt-1">
                                             Sembunyikan
                                         </button>
                                     </div>
@@ -211,19 +282,25 @@ new class extends Component {
 
                                 {{-- Lokasi --}}
                                 <div class="flex items-center text-gray-500 text-sm">
-                                    <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 6.627-5.25 12-12 12s-12-5.373-12-12 5.373-12 12-12 12 5.373 12 12z" />
+                                    <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                        stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M19.5 10.5c0 6.627-5.25 12-12 12s-12-5.373-12-12 5.373-12 12-12 12 5.373 12 12z" />
                                     </svg>
                                     <span class="truncate">{{ Str::limit($laporan->lokasi_detail, 40) }}</span>
                                 </div>
 
                                 {{-- Info Desa --}}
                                 <div class="flex items-center text-gray-500 text-sm mt-2">
-                                    <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                                    <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                        stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
                                     </svg>
-                                    <span class="truncate">Desa {{ $laporan->desa->nama_desa ?? 'Tidak Diketahui' }}</span>
+                                    <span class="truncate">Desa
+                                        {{ $laporan->desa->nama_desa ?? 'Tidak Diketahui' }}</span>
                                 </div>
                             </div>
                         </div>
