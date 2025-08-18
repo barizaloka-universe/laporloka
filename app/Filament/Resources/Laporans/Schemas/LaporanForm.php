@@ -30,10 +30,11 @@ class LaporanForm
                     ->label('Detail Lokasi')
                     ->maxLength(255)
                     ->readOnly(),
-                TextInput::make('status')
+                // status
+                Select::make('status')
                     ->label('Status Laporan')
-                    ->required()
-                    ->readOnly(),
+                    ->options(LaporanStatus::asSelectArray())
+                    ->required(),
                 TextInput::make('prioritas')
                     ->label('Prioritas Laporan')
                     ->required()
