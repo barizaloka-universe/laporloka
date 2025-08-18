@@ -33,7 +33,7 @@ class LaporanForm
                 // status
                 Select::make('status')
                     ->label('Status Laporan')
-                    ->options(LaporanStatus::asSelectArray())
+                    ->options(LaporanStatus::array())
                     ->required(),
                 TextInput::make('prioritas')
                     ->label('Prioritas Laporan')
