@@ -7,18 +7,21 @@ use Illuminate\Support\Str;
 use App\Models\Laporan;
 use App\Models\Desa;
 use Livewire\Attributes\On;
+use Livewire\WithPagination;
 
 new class extends Component {
-    public $laporans;
+    use WithPagination;
+
     public $desas;
     public $selectedDesa = '';
     public $selectedStatus = '';
     public $selectedPrioritas = '';
 
+    protected $paginationTheme = 'tailwind';
+
     public function mount()
     {
         $this->desas = Desa::all();
-        $this->laporans = collect();
 
         $this->js(
             <<<JS
@@ -36,20 +39,20 @@ new class extends Component {
 
     public function updatedSelectedDesa($value)
     {
+        $this->resetPage();
         $this->cacheFilter('selectedDesa', $value);
-        $this->loadLaporans();
     }
 
     public function updatedSelectedStatus($value)
     {
+        $this->resetPage();
         $this->cacheFilter('selectedStatus', $value);
-        $this->loadLaporans();
     }
 
     public function updatedSelectedPrioritas($value)
     {
+        $this->resetPage();
         $this->cacheFilter('selectedPrioritas', $value);
-        $this->loadLaporans();
     }
 
     private function cacheFilter($key, $value)
@@ -61,7 +64,7 @@ new class extends Component {
         }
     }
 
-    private function loadLaporans()
+    public function getLaporansProperty()
     {
         $query = Laporan::query();
 
@@ -77,7 +80,7 @@ new class extends Component {
             $query->where('prioritas', $this->selectedPrioritas);
         }
 
-        $this->laporans = $query->orderBy('created_at', 'desc')->get();
+        return $query->orderBy('created_at', 'desc')->paginate(7);
     }
 
     public function getStatusLabel($status)
@@ -152,7 +155,7 @@ new class extends Component {
     </div>
 
     {{-- Loading State --}}
-    <div wire:loading wire:target="selectedDesa"
+    <div wire:loading wire:target="selectedDesa,selectedStatus,selectedPrioritas"
         class="bg-white rounded-xl shadow-md p-8 text-center border border-gray-200">
         <div class="text-gray-400 mb-4">
             <svg class="animate-spin mx-auto h-8 w-8" fill="none" viewBox="0 0 24 24">
@@ -191,13 +194,14 @@ new class extends Component {
         </div>
     </div>
 
-    @if ($laporans->isEmpty() && !$selectedDesa)
+    @if ($this->laporans->isEmpty() && !$selectedDesa)
         <div class="bg-white rounded-xl shadow-md p-8 text-center border border-gray-200">
             <div class="text-gray-400 mb-4">
                 <svg class="mx-auto h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                     stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M17.25 12V4.5m1.5 0H21m-2.25 18H15M4.5 9.75v10.5m0-10.5a1.5 1.5 0 01-1.5-1.5V6a2.25 2.25 0 012.25-2.25h1.372c.516 0 .966.351 1.107.855l.208.73a1.5 1.5 0 001.442 1.08h3.525a1.5 1.5 0 001.442-1.08l.208-.73c.141-.504.591-.855 1.107-.855h1.372A2.25 2.25 0 0121 6v6.75m-18 0v2.25A2.25 2.25 0 005.25 15h13.5a2.25 2.25 0 002.25-2.25V12M15 18a3 3 0 11-6 0 3 3 0 016 0z" />
+                        d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M17.25 12V4.5m1.5 0H21m-2.25 18H15M4.5 9.75v10.5">
+                    </path>
                 </svg>
             </div>
             <h3 class="text-gray-500 text-xl font-semibold">Pilih Desa</h3>
@@ -205,13 +209,14 @@ new class extends Component {
                 Silakan pilih desa untuk menampilkan laporan.
             </p>
         </div>
-    @elseif ($laporans->isEmpty() && $selectedDesa)
+    @elseif ($this->laporans->isEmpty() && $selectedDesa)
         <div class="bg-white rounded-xl shadow-md p-8 text-center border border-gray-200">
             <div class="text-gray-400 mb-4">
                 <svg class="mx-auto h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                     stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M17.25 12V4.5m1.5 0H21m-2.25 18H15M4.5 9.75v10.5m0-10.5a1.5 1.5 0 01-1.5-1.5V6a2.25 2.25 0 012.25-2.25h1.372c.516 0 .966.351 1.107.855l.208.73a1.5 1.5 0 001.442 1.08h3.525a1.5 1.5 0 001.442-1.08l.208-.73c.141-.504.591-.855 1.107-.855h1.372A2.25 2.25 0 0121 6v6.75m-18 0v2.25A2.25 2.25 0 005.25 15h13.5a2.25 2.25 0 002.25-2.25V12M15 18a3 3 0 11-6 0 3 3 0 016 0z" />
+                        d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25">
+                    </path>
                 </svg>
             </div>
             <h3 class="text-gray-500 text-xl font-semibold">Belum Ada Laporan</h3>
@@ -220,8 +225,8 @@ new class extends Component {
             </p>
         </div>
     @else
-        <div wire:loading.remove wire:target="selectedDesa">
-            @foreach ($laporans as $laporan)
+        <div wire:loading.remove wire:target="selectedDesa,selectedStatus,selectedPrioritas">
+            @foreach ($this->laporans as $laporan)
                 <div
                     class="bg-white rounded-xl my-2 shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden border border-gray-200">
                     {{-- Header --}}
@@ -297,7 +302,8 @@ new class extends Component {
                                     <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                                         stroke-width="1.5">
                                         <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                                            d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125">
+                                        </path>
                                     </svg>
                                     <span class="truncate">Desa
                                         {{ $laporan->desa->nama_desa ?? 'Tidak Diketahui' }}</span>
@@ -307,6 +313,11 @@ new class extends Component {
                     </div>
                 </div>
             @endforeach
+
+            {{-- Pagination --}}
+            <div class="mt-4">
+                {{ $this->laporans->links() }}
+            </div>
         </div>
     @endif
 </div>
