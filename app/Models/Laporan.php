@@ -32,8 +32,7 @@ class Laporan extends Model
         'desa_id',
         'status',
         'prioritas',
-        'catatan_admin',
-        'alasan_penolakan',
+        'catatan_admin'
     ];
 
     /**
