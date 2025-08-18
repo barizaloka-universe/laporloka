@@ -182,20 +182,11 @@ new class extends Component {
                     {{-- Content --}}
                     <div class="p-6">
                         <div class="flex items-start md:space-x-6 flex-col md:flex-row">
-                            {{-- Foto --}}
-                            @if ($laporan->foto)
-                                <div class="shrink-0 mb-4 md:mb-0">
-                                    <img src="{{ Storage::url($laporan->foto) }}" alt="Foto Laporan"
-                                        class="rounded-md object-cover w-full h-48 md:w-48 cursor-pointer hover:opacity-95 transition-opacity duration-200"
-                                        onclick="openImageModal('{{ Storage::url($laporan->foto) }}')">
-                                </div>
-                            @endif
-
                             {{-- Info Laporan --}}
                             <div class="flex-grow">
                                 {{-- Judul singkat --}}
                                 <h3 class="text-gray-900 text-xl font-semibold mb-2 leading-tight">
-                                    {{ Str::limit($laporan->judul ?? $laporan->deskripsi, 80) }}
+                                    {{ Str::limit($laporan->judul_laporan, 40) }}
                                 </h3>
 
                                 {{-- Deskripsi Lengkap dengan toggle --}}
@@ -222,7 +213,7 @@ new class extends Component {
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 6.627-5.25 12-12 12s-12-5.373-12-12 5.373-12 12-12 12 5.373 12 12z" />
                                     </svg>
-                                    <span class="truncate">{{ $laporan->lokasi }}</span>
+                                    <span class="truncate">{{ Str::limit($laporan->lokasi_detail, 40) }}</span>
                                 </div>
 
                                 {{-- Info Desa --}}
@@ -239,37 +230,4 @@ new class extends Component {
             @endforeach
         </div>
     @endif
-
-    {{-- Modal untuk melihat gambar --}}
-    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-80 hidden z-[99] flex items-center justify-center p-4 transition-opacity duration-300"
-        onclick="closeImageModal()">
-        <div class="relative max-w-full max-h-full" onclick="event.stopPropagation()">
-            <img id="modalImage" src="" alt="Foto Laporan"
-                class="max-w-full max-h-[90vh] object-contain rounded-lg shadow-xl">
-            <button onclick="closeImageModal()"
-                class="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors text-3xl font-bold p-2">
-                &times;
-            </button>
-        </div>
-    </div>
-
-    <script>
-        function openImageModal(imageSrc) {
-            document.getElementById('modalImage').src = imageSrc;
-            document.getElementById('imageModal').classList.remove('hidden');
-            document.body.style.overflow = 'hidden'; // Mencegah scrolling
-        }
-
-        function closeImageModal() {
-            document.getElementById('imageModal').classList.add('hidden');
-            document.body.style.overflow = 'auto'; // Mengaktifkan scrolling kembali
-        }
-
-        // Close modal with Escape key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeImageModal();
-            }
-        });
-    </script>
 </div>
