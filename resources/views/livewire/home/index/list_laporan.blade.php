@@ -81,6 +81,7 @@ new class extends Component {
             LaporanPrioritas::Rendah => 'Rendah',
             LaporanPrioritas::Sedang => 'Sedang',
             LaporanPrioritas::Tinggi => 'Tinggi',
+            LaporanPrioritas::Darurat => 'Darurat',
             default => 'Tidak Diketahui',
         };
     }
@@ -93,6 +94,7 @@ new class extends Component {
             LaporanPrioritas::Rendah => 'bg-green-100 text-green-700',
             LaporanPrioritas::Sedang => 'bg-yellow-100 text-yellow-700',
             LaporanPrioritas::Tinggi => 'bg-red-100 text-red-700',
+            LaporanPrioritas::Darurat => 'bg-orange-100 text-orange-700',
             default => 'bg-gray-100 text-gray-700',
         };
 

@@ -2,6 +2,7 @@
 
 use App\Models\Laporan;
 use App\Models\Desa; // Impor model Desa
+use App\Enums\LaporanPrioritas; // Impor enum LaporanPrioritas
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
@@ -22,6 +23,10 @@ new class extends Component
 
     #[Rule('required|string|max:255')]
     public string $lokasi_detail = '';
+
+    // Tambahan untuk prioritas
+    #[Rule('required|string|in:rendah,sedang,tinggi,darurat')]
+    public string $prioritas = '';
 
     // Properti untuk menyimpan daftar desa
     public $desas = [];
@@ -47,11 +52,14 @@ new class extends Component
         $laporan->desa_id = $validated['desa_id'];
         
         $laporan->lokasi_detail = $validated['lokasi_detail'];
+        
+        // Menyimpan prioritas menggunakan enum
+        $laporan->prioritas = LaporanPrioritas::from($validated['prioritas']);
 
         $laporan->save();
 
         // Reset field
-        $this->reset(['judul_laporan', 'deskripsi', 'desa_id', 'lokasi_detail']);
+        $this->reset(['judul_laporan', 'deskripsi', 'desa_id', 'lokasi_detail', 'prioritas']);
 
         // Refresh data
         $this->mount();
@@ -126,6 +134,25 @@ new class extends Component
             class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             required>
         @error('lokasi_detail')
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+        @enderror
+    </div>
+
+    <!-- Prioritas -->
+    <div>
+        <label for="prioritas" class="block text-sm font-medium text-gray-700 mb-2">
+            Prioritas Laporan
+        </label>
+        <select id="prioritas" name="prioritas" wire:model="prioritas"
+            class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            required>
+            <option value="">-- Pilih Prioritas --</option>
+            <option value="rendah" class="text-green-600">Rendah - Tidak mendesak</option>
+            <option value="sedang" class="text-yellow-600">Sedang - Perlu perhatian</option>
+            <option value="tinggi" class="text-orange-600">Tinggi - Segera ditangani</option>
+            <option value="darurat" class="text-red-600">Darurat - Butuh tindakan cepat</option>
+        </select>
+        @error('prioritas')
             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
         @enderror
     </div>
