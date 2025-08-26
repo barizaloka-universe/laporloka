@@ -23,8 +23,7 @@ Ikuti langkah-langkah berikut untuk memasang LaporDesa di server Anda:
 Pastikan server Anda memenuhi persyaratan minimum, seperti:
 
   - PHP versi 8.3 atau lebih tinggi
-  - MySQL atau MariaDB
-  - Web server (Apache atau Nginx)
+  - Database
 
 #### 2\. Kloning Repositori
 
