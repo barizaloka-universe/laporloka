@@ -7,6 +7,7 @@ use Livewire\Volt\Volt;
 Route::controller(\App\Http\Controllers\HomeController::class)
     ->group(function () {
         Route::get('/', 'index')->name('home');
+        Route::get('/laporan/{laporan}', 'show_laporan')->name('laporan.show');
         Route::get('/about', 'about')->name('about');
     });
 
