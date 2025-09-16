@@ -39,7 +39,7 @@ class LaporanPolicy
     public function update(User $user, Laporan $laporan): bool
     {
         $roles = $user->getRoleNames();
-        return !$roles->contains('admin');
+        return $roles->contains('admin');
     }
 
     /**
