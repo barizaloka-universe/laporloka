@@ -203,10 +203,16 @@ new class extends Component {
                                     </span>
                                 @endif
                             </div>
-                            <span class="text-xs text-gray-500 shrink-0"
-                                title="{{ $laporan->created_at->format('d M Y, H:i') }}">
-                                {{ $laporan->created_at->diffForHumans() }}
-                            </span>
+                            {{-- Meta Info --}}
+                            <div class="flex items-center space-x-4 flex-wrap gap-y-2">
+                                <span class="text-xs text-blue-500 shrink-0">
+                                    {{ $laporan->threads()->count() }} komentar
+                                </span>
+                                <span class="text-xs text-green-500 shrink-0"
+                                    title="{{ $laporan->created_at->format('d M Y, H:i') }}">
+                                    {{ $laporan->created_at->diffForHumans() }}
+                                </span>
+                            </div>
                         </div>
                     </div>
 
