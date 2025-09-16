@@ -19,4 +19,18 @@ class HomeController extends Controller
     {
         return view('pages.home.show_laporan', compact('laporan'));
     }
+
+    public function store_thread(Laporan $laporan)
+    {
+        $data = request()->validate([
+            'content' => 'required|string|max:1000',
+        ]);
+
+        $laporan->threads()->create([
+            'user_id' => auth()->id(),
+            'content' => $data['content'],
+        ]);
+
+        return redirect()->route('laporan.show', $laporan)->with('success', 'Thread berhasil ditambahkan.');
+    }
 }
