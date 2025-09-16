@@ -14,6 +14,11 @@
         </div>
     </main>
 
+    <!-- Floating Button -->
+    <button id="floatingButton" class="fixed bottom-8 right-8 bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400">
+        ❓
+    </button>
+
     <!-- Popup Modal -->
     <div id="emergencyPopup" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
         <div class="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
@@ -24,22 +29,12 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const popup = document.getElementById('emergencyPopup');
-            const closePopup = document.getElementById('closePopup');
+        document.getElementById('floatingButton').addEventListener('click', function () {
+            document.getElementById('emergencyPopup').classList.remove('hidden');
+        });
 
-            function showPopup() {
-                popup.classList.remove('hidden');
-            }
-
-            function hidePopup() {
-                popup.classList.add('hidden');
-            }
-
-            showPopup();
-
-            // Close popup when the button is clicked
-            closePopup.addEventListener('click', hidePopup);
+        document.getElementById('closePopup').addEventListener('click', function () {
+            document.getElementById('emergencyPopup').classList.add('hidden');
         });
     </script>
 </x-layouts.home>
