@@ -16,17 +16,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::factory(10)->create();
-
-        // if user not exist, create one 
-        if (!User::where('email', 'test@example.com')->exists()) {
-            User::factory()->create([
-                'name' => 'Test User',
-                'email' => 'test@example.com',
-            ]);
-        }
-
         Laporan::factory(50)->create();
-
         $this->call(SpatieSeeder::class);
+
+        $user = User::factory()->admin()->create();
+        $user->assignRole('admin');
     }
 }
