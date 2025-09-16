@@ -23,7 +23,6 @@
                 <h3 class="text-lg font-semibold text-gray-700">Status:</h3>
                 <p class="text-gray-600">{{ $laporan->status }}</p>
             </div>
-            </div>
         </div>
     </main>
 </x-layouts.home>
