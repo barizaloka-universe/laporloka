@@ -10,7 +10,6 @@ use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
-use App\Models\Desa; // Pastikan model Desa sudah di-import
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Tables\Filters\SelectFilter;
@@ -23,7 +22,6 @@ class LaporansTable
             ->columns([
                 TextColumn::make('judul_laporan')->searchable()->sortable(),
                 TextColumn::make('deskripsi')->searchable()->limit(50)->sortable(),
-                TextColumn::make('desa.nama_desa')->label('Desa')->searchable()->sortable(),
                 TextColumn::make('status'),
                 TextColumn::make('prioritas'),
                 TextColumn::make('created_at')->dateTime()->sortable(),
@@ -32,7 +30,6 @@ class LaporansTable
             ])
             ->filters([
                 TrashedFilter::make(),
-                SelectFilter::make('desa_id')->label('Filter berdasarkan Desa')->relationship('desa', 'nama_desa')->searchable()->preload(),
                 // berdasarkan status
                 SelectFilter::make('status')
                     ->options([
