@@ -67,23 +67,6 @@
                     </div>
                 </div>
             </section>
-
-            <!-- Footer Section -->
-            <section class="text-center mt-16 animate-slideUp">
-                <div class="bg-purple-50 rounded-2xl shadow-inner p-8">
-                    <p class="text-lg text-gray-700 leading-relaxed mb-6">
-                        LaporLoka dikembangkan dan dikelola oleh tim profesional
-                        <span class="font-semibold text-purple-700">Barizaloka Universe</span>,
-                        yang berdedikasi untuk menciptakan solusi teknologi yang inovatif untuk kemajuan masyarakat.
-                    </p>
-                    <a href="https://barizaloka.id/universe/apps/laporloka"
-                       target="_blank"
-                       rel="noopener noreferrer"
-                       class="inline-block bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-xl transition duration-300 transform hover:scale-105 shadow-lg hover:shadow-purple-400">
-                        🚀 Kunjungi Website Kami
-                    </a>
-                </div>
-            </section>
         </div>
     </main>
 </x-layouts.home>
