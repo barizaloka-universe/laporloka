@@ -6,10 +6,6 @@ use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Laporan;
-use Database\Seeders\ProvinsiSeeder;
-use Database\Seeders\KabupatenSeeder;
-use Database\Seeders\KecamatanSeeder;
-use Database\Seeders\DesaSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -18,20 +14,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        User::factory(10)->create();
 
-        $this->call([
-            ProvinsiSeeder::class,
-            KabupatenSeeder::class,
-            KecamatanSeeder::class,
-            DesaSeeder::class,
-            // Add other seeders here if needed
-            // Example: OtherSeeder::class,
-        ]);
-
-        // User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        // if user not exist, create one 
+        if (!User::where('email', 'test@example.com')->exists()) {
+            User::factory()->create([
+                'name' => 'Test User',
+                'email' => 'test@example.com',
+            ]);
+        }
     }
 }

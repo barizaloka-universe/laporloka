@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Laporan;
-use App\Models\Desa; // Impor model Desa
 use App\Enums\LaporanPrioritas; // Impor enum LaporanPrioritas
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
@@ -17,10 +16,6 @@ new class extends Component
     #[Rule('required|string')]
     public string $deskripsi = '';
 
-    // Mengubah properti menjadi desa_id agar sesuai dengan kolom di database
-    #[Rule('required|string|max:255')]
-    public string $desa_id = '';
-
     #[Rule('required|string|max:255')]
     public string $lokasi_detail = '';
 
@@ -28,15 +23,9 @@ new class extends Component
     #[Rule('required|string|in:rendah,sedang,tinggi,darurat')]
     public string $prioritas = '';
 
-    // Properti untuk menyimpan daftar desa
-    public $desas = [];
-
     public function mount()
     {
         $this->laporans = Laporan::latest()->take(5)->get();
-
-        // Mengambil semua data dari model Desa
-        $this->desas = Desa::all();
     }
 
     public function simpanLaporan()
@@ -47,10 +36,6 @@ new class extends Component
 
         $laporan->judul_laporan = $validated['judul_laporan'];
         $laporan->deskripsi = $validated['deskripsi'];
-        
-        // Menggunakan desa_id, bukan desa
-        $laporan->desa_id = $validated['desa_id'];
-        
         $laporan->lokasi_detail = $validated['lokasi_detail'];
         
         // Menyimpan prioritas menggunakan enum
@@ -59,7 +44,7 @@ new class extends Component
         $laporan->save();
 
         // Reset field
-        $this->reset(['judul_laporan', 'deskripsi', 'desa_id', 'lokasi_detail', 'prioritas']);
+        $this->reset(['judul_laporan', 'deskripsi', 'lokasi_detail', 'prioritas']);
 
         // Refresh data
         $this->mount();
@@ -102,24 +87,6 @@ new class extends Component
             class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
             required></textarea>
         @error('deskripsi')
-            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-        @enderror
-    </div>
-
-    <!-- Dropdown Desa -->
-    <div>
-        <label for="desa_id" class="block text-sm font-medium text-gray-700 mb-2">
-            Pilih Desa
-        </label>
-        <select id="desa_id" name="desa_id" wire:model="desa_id"
-            class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            required>
-            <option value="">-- Pilih Desa --</option>
-            @foreach($desas as $desa)
-                <option value="{{ $desa->kode_desa }}">{{ $desa->nama_desa }}</option>
-            @endforeach
-        </select>
-        @error('desa_id')
             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
         @enderror
     </div>
