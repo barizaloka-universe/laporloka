@@ -6,6 +6,7 @@ use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Laporan;
+use Database\Seeders\SpatieSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -25,5 +26,7 @@ class DatabaseSeeder extends Seeder
         }
 
         Laporan::factory(50)->create();
+
+        $this->call(SpatieSeeder::class);
     }
 }
