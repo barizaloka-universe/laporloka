@@ -35,10 +35,11 @@ class LaporanForm
                     ->label('Status Laporan')
                     ->options(LaporanStatus::array())
                     ->required(),
-                TextInput::make('prioritas')
+                // prioritas
+                Select::make('prioritas')
                     ->label('Prioritas Laporan')
-                    ->required()
-                    ->readOnly(),
+                    ->options(LaporanPrioritas::array())
+                    ->required(),
                 Textarea::make('catatan_admin')
                     ->label('Catatan Admin')
                     ->rows(3),
