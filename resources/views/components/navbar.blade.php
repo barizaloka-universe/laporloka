@@ -1,16 +1,12 @@
 <header class="bg-gradient-to-r from-purple-700 to-purple-900 text-white shadow-lg">
     <div class="container mx-auto px-4 py-4">
         <div class="flex justify-between items-center">
-            <h1 class="text-2xl font-bold tracking-wide animate-fade-in">
+            <a href="/" class="text-2xl font-bold tracking-wide animate-fade-in">
                 🌌 Portal Laporan Warga
-            </h1>
+            </a>
 
             <!-- Desktop Nav -->
             <nav class="hidden md:flex space-x-6">
-                <a href="/" wire:navigate
-                    class="relative hover:text-purple-200 transition-colors duration-300 after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[2px] after:bg-purple-300 hover:after:w-full after:transition-all">
-                    Beranda
-                </a>
                 <a href="{{ route('about') }}" wire:navigate
                     class="relative hover:text-purple-200 transition-colors duration-300 after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[2px] after:bg-purple-300 hover:after:w-full after:transition-all">
                     Tentang
@@ -28,7 +24,6 @@
 
         <!-- Mobile menu -->
         <div id="mobileMenu" class="hidden flex-col mt-4 space-y-3 animate-slide-down">
-            <a href="/" wire:navigate class="block hover:text-purple-200 transition-colors">Beranda</a>
             <a href="{{ route('about') }}" wire:navigate
                 class="block hover:text-purple-200 transition-colors">Tentang</a>
         </div>
