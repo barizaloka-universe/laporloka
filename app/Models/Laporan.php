@@ -19,20 +19,7 @@ class Laporan extends Model
      */
     protected $table = 'laporan';
 
-    /**
-     * Atribut yang dapat diisi secara massal (mass assignable).
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'judul_laporan',
-        'deskripsi',
-        'lokasi_detail',
-        'desa_id',
-        'status',
-        'prioritas',
-        'catatan_admin'
-    ];
+    protected $guarded = ['id'];
 
     /**
      * Atribut yang harus diubah ke tipe data tertentu.
