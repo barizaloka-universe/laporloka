@@ -23,5 +23,7 @@ class DatabaseSeeder extends Seeder
                 'email' => 'test@example.com',
             ]);
         }
+
+        Laporan::factory(50)->create();
     }
 }
